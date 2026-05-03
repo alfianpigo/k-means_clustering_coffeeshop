@@ -219,8 +219,7 @@ st.markdown(CSS_SIDEBAR, unsafe_allow_html=True)
 
 
 # =========================================================
-# PREPROCESSING (VERSI LEBIH TAJAM)
-# Target: final_text lebih "isi" → buang noise, expand singkatan, fix typo, buang token asing/tidak bermakna
+# PREPROCESSING
 # =========================================================
 factory_stem = StemmerFactory()
 STEMMER = factory_stem.create_stemmer()
@@ -265,7 +264,7 @@ DEFAULT_CUSTOM_STOPWORDS: Set[str] = {
     "bagini", "begitunya", "like", "such", "something", "stuff",
 }
 
-# domain stopwords (lebih tajam; kamu bisa matikan)
+# domain stopwords 
 DOMAIN_STOPWORDS: Set[str] = {
     # terlalu umum/generic adjektif
     "enak", "mantap", "bagus", "oke", "ok", "jahat",
@@ -278,7 +277,7 @@ DOMAIN_STOPWORDS: Set[str] = {
     "juice", "jus", "kombucha", "matcha", "boba", "teh2", "susu2",
     "espresso", "latte", "cappuccino", "americano",
     "mocha", "macchiato", "flat", "cortado",
-    # food-specific items (apa yang dipesan, bukan feature)
+    # food-specific items 
     # - makanan lokal/spesifik
     "nasgitel", "nasi", "gitel", "camilan", "camil", "snack", "snack2", "makanan",
     "ketan", "ketan2", "goreng", "gorengnya", "gorengan", "gorengan2",
@@ -290,7 +289,7 @@ DOMAIN_STOPWORDS: Set[str] = {
     "seperti", "mirip", "begini", "begitunya", "gini2",
 }
 
-# kata "kotor" / token yang sering muncul tapi tidak punya makna inti
+# kata "kotor"
 GARBAGE_TOKENS: Set[str] = {
     # partikel filler
     "gitu", "gini", "aja", "doang", "cuma", "sih", "nih", "deh", "dong", "kok", "saja",
@@ -313,7 +312,7 @@ GARBAGE_TOKENS: Set[str] = {
     "cantik", "cantik2", "bagus2", "oke2", "okoke", "baik2",
 }
 
-# Normalisasi singkatan / typo yang sering muncul (VERSI EXPANDED)
+# Normalisasi singkatan / typo yang sering muncul
 NORMALIZE_DICT: Dict[str, str] = {
     # intensifier - normalize ke base form
     "bgt": "banget", "bgtt": "banget", "bnget": "banget", "bgtss": "banget", "bgt2": "banget",
@@ -365,7 +364,7 @@ NORMALIZE_DICT: Dict[str, str] = {
     "pas": "tepat",
     "langganan": "pelanggan",
     "order2": "order",
-    # food items → kategori (agar lebih abstrak)
+    # food items → kategori 
     "nasgitel": "makanan", "nasitel": "makanan", "nasgitelnya": "makanan",
     "camil": "makanan", "camilan2": "makanan", "camilannya": "makanan",
     "ketan2": "makanan", "ketannya": "makanan",
@@ -385,8 +384,6 @@ NORMALIZE_DICT: Dict[str, str] = {
     "gini": "begini",
 }
 
-# typo correction tambahan (pattern-based) – murah tapi efektif
-# contoh: "kualitass" -> "kualitas"
 REPEAT_END_RE = re.compile(r"([a-z])\1+$", re.IGNORECASE)
 
 # Token alfabet (min 2 huruf)
@@ -423,8 +420,8 @@ def clean_and_casefold(text: str) -> str:
 
     t = re.sub(r"http\S+|www\.\S+", " ", t)
     t = re.sub(r"[@#]\w+", " ", t)
-    t = re.sub(r"\d+", " ", t)                 # buang angka
-    t = re.sub(r"[^a-zA-Z\s]", " ", t)         # sisakan huruf
+    t = re.sub(r"\d+", " ", t)                 
+    t = re.sub(r"[^a-zA-Z\s]", " ", t)         
     t = re.sub(r"\s+", " ", t).strip()
     return t
 
@@ -452,7 +449,7 @@ def normalize_tokens(tokens: List[str], norm_dict: Dict[str, str]) -> List[str]:
         t2 = norm_dict.get(t2, t2)
         t2 = _final_typo_fix(t2)
 
-        # filter ketat LEBIH KETAT:
+        # filter ketat
         # - buang token panjangnya < 4 (bukan 3)
         # - buang token "garbage"
         # - buang token single-char
@@ -480,7 +477,7 @@ def stem_sentence(tokens: List[str]) -> List[str]:
     joined = " ".join(tokens)
     stemmed = STEMMER.stem(joined)
     toks = stemmed.split()
-    # post-filter setelah stemming (kadang jadi pendek) - LEBIH KETAT
+    # post-filter setelah stemming
     # filter: panjang >= 4, bukan garbage, gabungkan dengan DOMAIN_STOPWORDS
     combined_stopwords = GARBAGE_TOKENS | DOMAIN_STOPWORDS
     toks = [t for t in toks if len(t) >= 4 and t not in combined_stopwords]
@@ -732,7 +729,7 @@ with tabs[0]:
 
 
 # =========================================================
-# RUN PREPROCESS (TAJAM)
+# RUN PREPROCESS
 # =========================================================
 custom_added = set()
 if add_stopwords_text.strip():
